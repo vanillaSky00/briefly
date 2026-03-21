@@ -1,5 +1,18 @@
 # Digest — Backend News Aggregation Service
 
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-6DB33F?logo=springboot&logoColor=white)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-3.5.5-6DB33F?logo=spring&logoColor=white)
+![Hibernate](https://img.shields.io/badge/Hibernate-ORM-59666C?logo=hibernate&logoColor=white)
+![HikariCP](https://img.shields.io/badge/HikariCP-default-blue)
+![Flyway](https://img.shields.io/badge/Flyway-migrations-CC0200?logo=flyway&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Spring Cloud OpenFeign](https://img.shields.io/badge/OpenFeign-2025.0.0-6DB33F?logo=spring&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-3.5.5-6DB33F?logo=springsecurity&logoColor=white)
+![LINE Bot SDK](https://img.shields.io/badge/LINE%20Bot%20SDK-9.11.0-00C300?logo=line&logoColor=white)
+![Testcontainers](https://img.shields.io/badge/Testcontainers-PostgreSQL-2496ED?logo=docker&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+
 A Spring Boot backend service that aggregates content from multiple news sources (Hacker News, The Guardian) and delivers digests to users via a LINE Bot webhook. Built as a learning project to explore the Spring ecosystem in depth — the value isn't in "fetching news" (any LLM can summarize headlines), but in how the pieces fit together: **JPA/Hibernate entity mapping, HikariCP connection pooling, Flyway migrations, Feign declarative HTTP clients, and hexagonal architecture with Spring's DI**.
 
 ## Tech Stack
