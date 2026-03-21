@@ -1,4 +1,4 @@
-# Digest — Backend News Aggregation Service
+# Briefly — News Ingestion and Aggregation Backend
 
 ![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-6DB33F?logo=springboot&logoColor=white)
