@@ -38,4 +38,4 @@ public class DigestApplication {
 }
 
 //make a profile to let yml be not ambiguous
-// docker compose -f docker-compose.yml up -d db
+// docker compose --env-file deploy/.env -f deploy/compose/docker-compose.yml up -d db

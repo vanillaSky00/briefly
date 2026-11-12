@@ -1,0 +1,25 @@
+name: briefly
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/compose/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+#    volumes:
+#      - ../../secrets/guardian.api-key:/run/secrets/guardian.api-key:ro
+#      - ../../secrets/newsapi.api-key:/run/secrets/newsapi.api-key:ro
+#    environment:
+#      SPRING_CONFIG_IMPORT: optional:configtree:/run/secrets/
+
+    environment:
+      - GUARDIAN_API_KEY=${GUARDIAN_API_KEY}
+      - LINE_CHANNEL_TOKEN=${LINE_CHANNEL_TOKEN}
+      - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

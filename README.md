@@ -10,16 +10,16 @@
 ![Flyway](https://img.shields.io/badge/Flyway-migrations-CC0200?logo=flyway&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 ![Spring Cloud OpenFeign](https://img.shields.io/badge/OpenFeign-2025.0.0-6DB33F?logo=spring&logoColor=white)
-![Spring Security](https://img.shields.io/badge/Spring%20Security-3.5.5-6DB33F?logo=springsecurity&logoColor=white)
 ![LINE Bot SDK](https://img.shields.io/badge/LINE%20Bot%20SDK-9.11.0-00C300?logo=line&logoColor=white)
-![Testcontainers](https://img.shields.io/badge/Testcontainers-PostgreSQL-2496ED?logo=docker&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
 <p align="center">
-  <img src="digest_architecture_overview.svg" width="650">
+  <img src="assets/digest_architecture_overview.svg" width="650">
 </p>
 
-A Spring Boot backend service that aggregates content from multiple news sources (Hacker News, The Guardian) and delivers digests to users via a LINE Bot webhook. Built as a learning project to explore the Spring ecosystem in depth — the value isn't in "fetching news" (any LLM can summarize headlines), but in how the pieces fit together: **JPA/Hibernate entity mapping, HikariCP connection pooling, Flyway migrations, Feign declarative HTTP clients, and hexagonal architecture with Spring's DI**.
+A Spring Boot backend service that aggregates content from multiple news sources (Hacker News, The Guardian) and delivers digests to users via a LINE Bot webhook. Built as a learning project to explore the Spring ecosystem and design pattern in depth.
+
+The value isn't in "fetching news", but in how the pieces fit together via a design pattern
+**JPA/Hibernate entity mapping, HikariCP connection pooling, Flyway migrations, Feign declarative HTTP clients, and hexagonal architecture with Spring's DI**.
 
 </div>
 
@@ -40,6 +40,8 @@ A Spring Boot backend service that aggregates content from multiple news sources
 ## Architecture
 
 The project follows **Hexagonal Architecture** (Ports & Adapters), keeping the domain logic completely decoupled from external concerns.
+
+See the [Architecture Decision Records](adr/README.md) for technical choices and their rationale.
 
 ```mermaid
 graph TB
@@ -127,28 +129,6 @@ sequenceDiagram
     LINE-->>U: 📚 New Articles digest
 ```
 
-## Key Technical Decisions
-
-### JPA / Hibernate
-
-Articles are stored as `ArticleEntity` mapped to a `articles` table. The repository uses both JPQL (for simple lookups by source + external ID, or by URL hash) and a **native query with window functions** (`ROW_NUMBER() OVER (PARTITION BY source)`) to grab the N latest articles per source in a single round trip. This is a deliberate choice — window functions are PostgreSQL-native and far more efficient than N+1 queries or application-side grouping.
-
-### HikariCP
-
-Spring Boot auto-configures HikariCP as the default connection pool. No custom tuning is needed for a single-service setup, but the pool sits between the JPA layer and PostgreSQL, keeping connection acquisition fast and bounded.
-
-### Flyway
-
-Database schema is version-controlled through Flyway migration scripts (`db/migration/V*.sql`). The app runs migrations automatically on startup before Hibernate touches the database. This means the schema is always reproducible and there's no reliance on `ddl-auto=update`.
-
-### OpenFeign
-
-Both external APIs are declared as plain Java interfaces (`HackerNewsClient`, `GuardianClient`) annotated with `@FeignClient`. Spring Cloud wires up the HTTP client, JSON deserialization, and timeout configuration. The Guardian client uses a per-client `GuardianFeignConfig` (intentionally not `@Configuration`-annotated) to inject the API key via a `RequestInterceptor` without leaking it to other Feign clients.
-
-### LINE Bot Webhook
-
-The `LineWebhookHandler` uses `@LineMessageHandler` / `@EventMapping` from the LINE SDK's Spring Boot integration. On any user message, it queries the database for the latest articles per source and replies with a formatted digest, chunked to respect LINE's 5000-character message limit.
-
 ## Pseudo Project Structure
 A simple overview of the core files.
 ```
@@ -185,20 +165,25 @@ io.github.vanillasky.digestplatform
 
 ### Run
 
+Copy [deploy/.env.example](deploy/.env.example) to `deploy/.env` and fill in your credentials before running:
+
 ```bash
-# 1. Start PostgreSQL
-docker compose up -d
+cp deploy/.env.example deploy/.env
 
-# 2. Set environment variables
-export POSTGRES_DB=digest
-export POSTGRES_USER=digest
-export POSTGRES_PASSWORD=<your-password>
-export LINE_BOT_CHANNEL_TOKEN=<token>
-export LINE_BOT_CHANNEL_SECRET=<secret>
-export SOURCE_GUARDIAN_API_KEY=<key>
+# Load credentials for the local Spring Boot process
+set -a
+. deploy/.env
+set +a
 
-# 3. Run the app
-./mvnw spring-boot:run
+# Start PostgreSQL, then run the app with the local database profile
+docker compose --env-file deploy/.env -f deploy/compose/docker-compose.yml up -d db
+SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
+```
+
+To run both PostgreSQL and the app in Docker, use:
+
+```bash
+docker compose --env-file deploy/.env -f deploy/compose/docker-compose.yml -f deploy/compose/compose.yml up --build -d
 ```
 
 Flyway will create/migrate the schema on first startup. The LINE webhook expects a publicly reachable URL — use [ngrok](https://ngrok.com/) for local development.
