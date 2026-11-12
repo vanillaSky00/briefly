@@ -16,7 +16,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
 <p align="center">
-  <img src="assets/digest_architecture_overview.svg" width="650">
+  <img src="digest_architecture_overview.svg" width="650">
 </p>
 
 A Spring Boot backend service that aggregates content from multiple news sources (Hacker News, The Guardian) and delivers digests to users via a LINE Bot webhook. Built as a learning project to explore the Spring ecosystem in depth — the value isn't in "fetching news" (any LLM can summarize headlines), but in how the pieces fit together: **JPA/Hibernate entity mapping, HikariCP connection pooling, Flyway migrations, Feign declarative HTTP clients, and hexagonal architecture with Spring's DI**.
